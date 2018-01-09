@@ -1,4 +1,5 @@
-  var myBooks = [
+
+var myBooks = [
             {
                 "Name": "Alok",
                 "Marks": 23,
@@ -70,7 +71,7 @@
             {
                 "LDAP": "Sunil",
                 "Score": 24,
-                "Course": "Histoy",
+                "Course": "History",
                 "Time Taken": 17
               
             },
@@ -111,11 +112,12 @@
     var obj={};
     obj[numVal] = totalArr;
     obj[name] = "All";
-    finalObj.push(obj);
+   // finalObj.push(obj);
     
     return finalObj;
   }
  
+
 
 
 
@@ -130,79 +132,29 @@
 //CreateTableFromJSON(myBooks);
 //CreateTableFromJSON(getTotal(myDocs,"LDAP","Course","Time Taken","Score"));
 
-CreateTableFromJSON(myDocs);
+var coursegraphData = getMarksById(myDocs,"Course","Time Taken").map(function(data){var obj={};obj["name"]=data["Course"];obj["y"]=data["Time Taken"];return obj; });
+
+
+var ldapgraphData = getMarksById(myDocs,"LDAP","Time Taken").map(function(data){var obj={};obj["name"]=data["LDAP"];obj["y"]=data["Time Taken"];return obj; });
 
 
 
-function CreateTableFromJSON(jsonElementArray) {
-
-        // EXTRACT VALUE FOR HTML HEADER. 
-        // ('Book ID', 'Book Name', 'Category' and 'Price')
-        var col = [];
-        for (var i = 0; i < jsonElementArray.length; i++) {
-            for (var key in jsonElementArray[i]) {
-                if (col.indexOf(key) === -1) {
-                    col.push(key);
-                }
-            }
-        }
-
-        // CREATE DYNAMIC TABLE.
-        var table = document.createElement("table");
-        
-            table.setAttribute("id","tableData");
-            table.setAttribute("class","table table-striped table-bordered");
-            
-        // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+drawPieChart(ldapgraphData,"LDAP","LDAP Breakage");
 
 
-        var thead = document.createElement("thead");
-                 
-                
-                
-        table.appendChild(thead);        
-   
-        // ADD JSON DATA TO THE TABLE AS ROWS.
-        for (var i = 0; i <  jsonElementArray.length; i++) {
+ drawPieChart(coursegraphData,"Course","Course Breakage");
 
-            tr = table.insertRow(-1);
 
-            for (var j = 0; j < col.length; j++) {
-                var tabCell = tr.insertCell(-1);
-                tabCell.innerHTML = jsonElementArray[i][col[j]];
-            }
-        }
 
-      
-                
-        // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
-        var divContainer = document.getElementById("showData");
-        divContainer.innerHTML = "";
-        divContainer.appendChild(table);
-             
-        var trThead = document.createElement("tr");
-      //  var thThead = document.createElement("th");
-                
-        for (var i = 0; i < col.length; i++) {
-            var thThead = document.createElement("th");      // TABLE HEADER.
-            thThead.innerHTML = col[i];
-            trThead.appendChild(thThead);
-        }
-                
-                
-        trThead.appendChild(thThead);
-        document.querySelector("thead").appendChild(trThead);        
-                
-                
-          var newtable = $('#tableData').DataTable({
-                lengthChange: false,
-                buttons: [ 'excel', 'pdf', 'colvis' ]
-            });
 
-            newtable.buttons().container().appendTo( ' .col-sm-6:eq(0)' );        
-             
-                
-    }
+createTableFromJSON(myDocs);
+
+
+
+
+
+
+
 
   //CreateTableFromJSON(anotherBooks, "showNewData");
 
