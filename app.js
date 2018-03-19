@@ -30,8 +30,8 @@ var myBooks = [
                 "Subject": "Computer"
             }
         ]
-  
-  
+//  
+//  
   var myDocs = [
             {
                 "LDAP": "Alok",
@@ -84,6 +84,61 @@ var myBooks = [
             }
         ]
   
+  var sheetId = "1jorzZXpSORH4tUkYK_HtW1cMNWYhGiOAMxcqUEPISe8";
+
+var getSheetURL = 'https://spreadsheets.google.com/feeds/list/'+sheetId+'/1/public/values?alt=json';
+  
+  $.getJSON(getSheetURL,function(response){
+    
+    myDocs =response.feed.entry.map(function(m,i){return JSON.parse("{\""+response.feed.entry.map(function(data){return data.content.$t})[i].trim().split(",").join('","').trim().split(":").join('":"').trim()+"\"}")});
+    
+      var select = document.getElementById("D1");
+
+
+var optionsVal = Object.values(myDocs[0]).filter(function(v){return !isNaN(v);}).map(function(val){ return Object.keys(myDocs[0])[Object.values(myDocs[0]).indexOf(val)] });
+      
+      
+      var stringHeadersVal = Object.values(myDocs[0]).filter(function(v){return isNaN(v);}).map(function(val){ return Object.keys(myDocs[0])[Object.values(myDocs[0]).indexOf(val)] });
+
+
+for(var i=0;i<optionsVal.length;i++) {    
+    opt = document.createElement("option");
+    opt.value =optionsVal[i];
+    opt.textContent = optionsVal[i];
+    select.appendChild(opt);
+}
+
+document.getElementById("D1").addEventListener("change",function(event){
+    dropDownChangd();
+});
+
+
+function dropDownChangd() {
+    var selectedVal = $( "#D1 option:selected" ).text();
+    
+    for(var i=0;i< stringHeadersVal.length;i++) {
+         var gData = getMarksById(myDocs,stringHeadersVal[i],selectedVal).map(
+        function(data){
+            var obj={};
+            obj["name"]=data[stringHeadersVal[i]];
+            obj["y"]=Number(data[selectedVal]);
+            return obj; 
+        });
+        drawPieChart(gData,stringHeadersVal[i],stringHeadersVal[i]+" Breakage");
+    }
+    
+}
+
+dropDownChangd();
+
+
+createTableFromJSON(myDocs);
+      
+  });
+  
+  
+  
+  
  function getTotal(val, name1, name2, numVal1,numVal2) {
     totalArr1 =  val.reduce(function(r,o){if(r){r+= o[numVal1];} else {r= o[numVal1];} return r;},(0));
     totalArr2 =  val.reduce(function(r,o){if(r){r+= o[numVal2];} else {r= o[numVal2];} return r;},(0));
@@ -98,13 +153,16 @@ var myBooks = [
   
      
  }
+
+
+
   
   function getMarksById(val, name, numVal ){  
     var valObj = val.reduce(
           function(r, o){
               if(r[o[name]]){
-                  r[o[name]] +=o[numVal]; }
-              else {r[o[name]] = o[numVal]; }
+                  r[o[name]] +=Number(o[numVal]); }
+              else {r[o[name]] = Number(o[numVal]); }
               return r;
           },{}); 
     var finalObj =  Object.keys(valObj).map(function(v,i){var obj={};obj[name]= v;obj[numVal]= valObj[v]; return obj; });
@@ -132,29 +190,10 @@ var myBooks = [
 //CreateTableFromJSON(myBooks);
 //CreateTableFromJSON(getTotal(myDocs,"LDAP","Course","Time Taken","Score"));
 
-var coursegraphData = getMarksById(myDocs,"Course","Time Taken").map(function(data){var obj={};obj["name"]=data["Course"];obj["y"]=data["Time Taken"];return obj; });
-
-
-var ldapgraphData = getMarksById(myDocs,"LDAP","Time Taken").map(function(data){var obj={};obj["name"]=data["LDAP"];obj["y"]=data["Time Taken"];return obj; });
-
-
-
-drawPieChart(ldapgraphData,"LDAP","LDAP Breakage");
-
-
- drawPieChart(coursegraphData,"Course","Course Breakage");
-
-
-
-
-createTableFromJSON(myDocs);
 
 
 
 
 
 
-
-
-  //CreateTableFromJSON(anotherBooks, "showNewData");
 
